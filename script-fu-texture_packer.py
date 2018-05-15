@@ -127,12 +127,12 @@ def get_output_file(output, filename):
 	return path
 
 
-def tp_plugin_main(timg, tdrawable, max_width, max_height, padding, autocrop, output):
+def tp_plugin_main(timg, tdrawable, max_width, max_height, padding, autocrop, optimization, output):
 	img = gimp.Image(int(max_width), int(max_height), RGB)
 
 	tree = PackNode((max_width, max_height))
 	layers_pack = []
-	layers = sorted([(layer.width * layer.height, layer) for layer in filter(lambda l: l.visible > 0, timg.layers)], reverse=True)
+	layers = sorted([(optimization and layer.height or layer.width, layer) for layer in filter(lambda l: l.visible > 0, timg.layers)], reverse=True)
 	success = True
 
 	for _, layer in layers:
@@ -190,6 +190,7 @@ register(
 					(PF_SPINNER, "atlas_height", "Max Atlas Height", 512, (1, 10000, 1)),
 					(PF_SPINNER, "texture_padding", "Texture Padding", 2, (0, 100, 1)),
 					(PF_BOOL, "avtocrop", "Avtocrop", False),
+					(PF_RADIO, "optimization", "Optimize by:", 0, (("width", 0), ("height", 1))),
 					(PF_DIRNAME, "output", "Otput Atlas JSON to:", None),
 				],
 				[],
